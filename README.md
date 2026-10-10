@@ -2,7 +2,8 @@
 
 **Automatic detection of wrong, missing and inconsistent labels** in object detection datasets, and **measurement of how label errors affect model performance**.
 
-<p align="center"><img src="docs/assets/pipeline.svg" width="100%" alt="Pipeline"></p>
+<p align="center"><img src="docs/assets/most_suspicious_coco128.jpg" width="100%" alt="Example"></p>
+<p align="center"><sub>The three lowest-scoring images of the quick COCO128 experiment (labels left, reference-model predictions right).</sub></p>
 
 > **Status:** Work in progress. Result tables will be added as experiments are completed.
 
@@ -11,6 +12,8 @@
 Object detectors are only as reliable as the labels they are trained on. Missing annotations, wrong classes and shifted boxes directly reduce a model's real-world performance. In datasets with thousands of images, finding these errors by hand is not practical.
 
 ## Approach
+
+<p align="center"><img src="docs/assets/pipeline.svg" width="100%" alt="Pipeline"></p>
 
 To measure the method objectively, **known errors** are injected into a clean dataset, and the share of those errors that is recovered automatically is measured.
 
@@ -59,6 +62,28 @@ python src/train_compare.py --data coco128.yaml --noisy data/noisy \
 
 ## Results
 
+### Quick experiment: COCO128
+
+Setup: 128 images, errors injected into 20% of them (27 images; seed 42), COCO-pretrained YOLO11s as the reference model, cleanlab label quality scores.
+
+| Metric | Value |
+|---|---|
+| Images flagged as issues | 23 |
+| Precision (flagged images that are truly corrupted) | 0.261 |
+| Recall (corrupted images that were found) | 0.222 |
+| Precision@27 (the 27 lowest-scoring images) | 0.296 |
+
+| Error type | Images | Recall |
+|---|---|---|
+| Missing box | 4 | 0.000 |
+| Wrong class | 9 | 0.222 |
+| Shifted box | 8 | 0.250 |
+| Spurious box | 6 | 0.333 |
+
+Two caveats shape how these numbers should be read. COCO128 is drawn from the COCO training set, so the reference model has seen these images — the setting this project is designed to avoid (see the cross-fitting design under Data). And part of the "false positives" may be genuine errors in the original COCO annotations, which the evaluation counts as wrong because only injected errors are known. Missing boxes were not detected at all at this scale: a missing label produces no label-side evidence for the score to penalise. The main experiment addresses both points.
+
+### Main experiment
+
 | Error type | Recall |
 |---|---|
 | Missing box | _TBD_ |
@@ -75,7 +100,7 @@ python src/train_compare.py --data coco128.yaml --noisy data/noisy \
 ## Roadmap
 
 - [x] Error injection, detection and comparison pipeline
-- [ ] Quick experiment on COCO128
+- [x] Quick experiment on COCO128
 - [ ] Two-fold cross experiment on a VisDrone subset
 - [ ] Comparison of different error rates (10%, 20%, 40%)
 
