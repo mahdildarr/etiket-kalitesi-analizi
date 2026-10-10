@@ -77,12 +77,19 @@ Setup: 128 images, errors injected into 20% of them (27 images; seed 42), COCO-p
 
 Two caveats shape how these numbers should be read. COCO128 is drawn from the COCO training set, so the reference model has seen these images, which is exactly the setting this project is designed to avoid (see the cross-fitting design under Data). And part of the "false positives" may be genuine errors in the original COCO annotations, which the evaluation counts as wrong because only injected errors are known. Missing boxes were not detected at all at this scale: a missing label produces no label-side evidence for the score to penalise. The main experiment addresses both points.
 
-## Roadmap
+## Progress
 
-- [x] Error injection, detection and comparison pipeline
-- [x] Quick experiment on COCO128
-- [ ] Two-fold cross experiment on a VisDrone subset
-- [ ] Comparison of different error rates (10%, 20%, 40%)
+- [x] Controlled injection of four label error types
+- [x] Label quality scores and issue detection with cleanlab
+- [x] Evaluation against the injected errors (precision, recall, per error type)
+- [x] Clean / noisy / cleaned retraining comparison
+- [x] Colab notebook
+- [x] First experiment on COCO128
+
+Next:
+
+- [ ] Cross-fitted experiment on a VisDrone subset
+- [ ] Different error rates (10%, 20%, 40%)
 
 ## Project structure
 
